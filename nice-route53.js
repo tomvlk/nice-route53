@@ -475,8 +475,9 @@ Route53.prototype.delRecord = function(opts, pollEvery, callback) {
         // loop through the records finding the one we want (if any)
         var newRecord;
         records.forEach(function(record) {
-            if ( opts.name === record.name && opts.type === record.type ) {
-                args.ChangeBatch.Changes.push({
+            if ( (opts.name === addTrailingDotToDomain(record.name) && opts.type === record.type)
+                && (!opts.geo || (opts.geo.continent === record.geo.ContinentCode))) {
+                var removeChange = {
                     Action : 'DELETE',
                     ResourceRecordSet: {
                         Name   : record.name,
@@ -488,7 +489,21 @@ Route53.prototype.delRecord = function(opts, pollEvery, callback) {
                             }
                         })
                     }
-                });
+                };
+
+                if (record.geo) {
+                    removeChange.ResourceRecordSet.GeoLocation = {};
+
+                    if (record.geo.ContinentCode) {
+                        removeChange.ResourceRecordSet.GeoLocation.ContinentCode = record.geo.ContinentCode;
+                    }
+                }
+
+                if (record.setid) {
+                    removeChange.ResourceRecordSet.SetIdentifier = record.setid;
+                }
+
+                args.ChangeBatch.Changes.push(removeChange);
             }
         });
 
