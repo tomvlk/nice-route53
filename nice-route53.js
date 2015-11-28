@@ -475,7 +475,7 @@ Route53.prototype.delRecord = function(opts, pollEvery, callback) {
         // loop through the records finding the one we want (if any)
         var newRecord;
         records.forEach(function(record) {
-            if ( (opts.name === addTrailingDotToDomain(record.name) && opts.type === record.type)
+            if ( (opts.name === record.name && opts.type === record.type)
                 && (!opts.geo || (opts.geo.continent === record.geo.ContinentCode))) {
                 var removeChange = {
                     Action : 'DELETE',
