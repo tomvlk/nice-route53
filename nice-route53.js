@@ -367,8 +367,9 @@ Route53.prototype.setRecord = function(opts, pollEvery, callback) {
         // loop through the records finding the one we want (if any)
         var newRecord;
         records.forEach(function(record) {
-            if ( opts.name === addTrailingDotToDomain(record.name) && opts.type === record.type ) {
-                args.ChangeBatch.Changes.push({
+            if ( (opts.name === addTrailingDotToDomain(record.name) && opts.type === record.type)
+                && (!opts.hasOwnProperty('geo') || (opts.geo.continent === record.geo.ContinentCode))) {
+                var removeChange = {
                     Action : 'DELETE',
                     ResourceRecordSet: {
                         Name   : record.name,
@@ -380,7 +381,19 @@ Route53.prototype.setRecord = function(opts, pollEvery, callback) {
                             }
                         })
                     }
-                });
+                };
+                if (record.geo) {
+                    removeChange.ResourceRecordSet.GeoLocation = {};
+
+                    if (record.geo.hasOwnProperty('ContinentCode')) {
+                        removeChange.ResourceRecordSet.GeoLocation.ContinentCode = record.geo.ContinentCode;
+                    }
+                }
+
+                if (record.setid) {
+                    removeChange.ResourceRecordSet.SetIdentifier = record.setid;
+                }
+                args.ChangeBatch.Changes.push();
             }
         });
 
@@ -393,6 +406,18 @@ Route53.prototype.setRecord = function(opts, pollEvery, callback) {
                 TTL    : opts.ttl,
             }
         };
+
+        if (opts.hasOwnProperty('geo')) {
+            change.ResourceRecordSet.GeoLocation = {};
+
+            if (opts.geo.hasOwnProperty('continent')) {
+                change.ResourceRecordSet.GeoLocation.ContinentCode = opts.geo.continent;
+            }
+        }
+
+        if (opts.hasOwnProperty('setid')) {
+            change.ResourceRecordSet.SetIdentifier = opts.setid;
+        }
 
         if (opts.values) {
             change
