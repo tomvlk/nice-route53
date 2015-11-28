@@ -100,6 +100,8 @@ function convertListResourceRecordSetsResponseToRecords(response) {
             name : removeTrailingDotFromDomain(recordSet.Name),
             type : recordSet.Type,
             ttl  : recordSet.TTL,
+            setid: recordSet.SetIdentifier || null,
+            geo  : recordSet.GeoLocation || null
         };
 
         // if there are no resource records, then this might be an Alias!

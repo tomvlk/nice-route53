@@ -3,3 +3,6 @@ test-*.js
 set-env-*.sh
 npm-debug.log
 *~
+
+.idea
+*.iml
