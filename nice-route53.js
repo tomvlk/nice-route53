@@ -368,7 +368,7 @@ Route53.prototype.setRecord = function(opts, pollEvery, callback) {
         var newRecord;
         records.forEach(function(record) {
             if ( (opts.name === addTrailingDotToDomain(record.name) && opts.type === record.type)
-                && (!opts.hasOwnProperty('geo') || (opts.geo.continent === record.geo.ContinentCode))) {
+                && (!opts.geo || (opts.geo.continent === record.geo.ContinentCode))) {
                 var removeChange = {
                     Action : 'DELETE',
                     ResourceRecordSet: {
@@ -385,7 +385,7 @@ Route53.prototype.setRecord = function(opts, pollEvery, callback) {
                 if (record.geo) {
                     removeChange.ResourceRecordSet.GeoLocation = {};
 
-                    if (record.geo.hasOwnProperty('ContinentCode')) {
+                    if (record.geo.ContinentCode) {
                         removeChange.ResourceRecordSet.GeoLocation.ContinentCode = record.geo.ContinentCode;
                     }
                 }
@@ -407,15 +407,15 @@ Route53.prototype.setRecord = function(opts, pollEvery, callback) {
             }
         };
 
-        if (opts.hasOwnProperty('geo')) {
+        if (opts.geo) {
             change.ResourceRecordSet.GeoLocation = {};
 
-            if (opts.geo.hasOwnProperty('continent')) {
+            if (opts.geo.continent) {
                 change.ResourceRecordSet.GeoLocation.ContinentCode = opts.geo.continent;
             }
         }
 
-        if (opts.hasOwnProperty('setid')) {
+        if (opts.setid) {
             change.ResourceRecordSet.SetIdentifier = opts.setid;
         }
 
