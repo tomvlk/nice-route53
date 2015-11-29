@@ -393,7 +393,7 @@ Route53.prototype.setRecord = function(opts, pollEvery, callback) {
                 if (record.setid) {
                     removeChange.ResourceRecordSet.SetIdentifier = record.setid;
                 }
-                args.ChangeBatch.Changes.push();
+                args.ChangeBatch.Changes.push(removeChange);
             }
         });
 
